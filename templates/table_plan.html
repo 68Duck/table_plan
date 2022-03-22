@@ -1,11 +1,20 @@
 {% extends "base_table_plan.html" %}
-{%block title%}Table Plan Login{%endblock%}
+{%block title%}Table Plan{%endblock%}
 {% block links %}<link rel="stylesheet" href="{{url_for('static',filename='table_plan.css')}}" type="text/css">{% endblock %}
-{%block scripts %}<script src="{{url_for('static', filename='table_plan.js')}}" charset="utf-8"></script>{%endblock%}
+{%block scripts %}
+<script type="text/javascript">
+  // test = get_names({{names|tojson}},{{forenames|tojson}},{{surnames|tojson}})
+  var names = {{names|tojson}}
+  var forenames = {{forenames|tojson}}
+  var surnames = {{surnames|tojson}}
+</script>
+<script src="{{url_for('static', filename='table_plan.js')}}" charset="utf-8"></script>
+{%endblock%}
 {% block header %}
-Table Plan Login
+Table Plan
 {% endblock %}
 {%block content%}
+
 <div class="alertDiv" id="alertDiv" style="display:none">
   <p class="alert" id="alert"></p>
 </div>
@@ -65,19 +74,23 @@ Table Plan Login
               {% for k in range(table_data[i][j]|length) %}
                 {% if k == 0 %}
                   <!-- this if statement is not necessary but is there in case the changeable property needs to be changed later -->
-                  <td contenteditable="false" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                  <td contenteditable="false" name="tableItem" class=".tableItem"><input readonly value="{{table_data[i][j][k]}}" class="autocomplete_input"></td>
                 {% else %}
                   {% if changeable_array[i][j] %}
-                    <td contenteditable="true" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                    {% if k == 1 %}
+                      <td contenteditable="false" name="tableItem" class=".tableItem autocomplete"><input name="forename_input" value="{{table_data[i][j][k]}}" class="autocomplete_input"></td>
+                    {% else %}
+                      <td contenteditable="false" name="tableItem" class=".tableItem autocomplete"><input name="surname_input" value="{{table_data[i][j][k]}}" class="autocomplete_input"></td>
+                    {% endif %}
                   {% else %}
-                    <td contenteditable="false" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                    <td contenteditable="false" name="tableItem" class=".tableItem"><input readonly value="{{table_data[i][j][k]}}" class="autocomplete_input"></td>
                   {% endif %}
                 {% endif %}
               {% endfor %}
             {% else %}
-              <td contenteditable="false" name="tableItem" class=".tableItem">{{j+1}}</td>
-              <td contenteditable="true" name="tableItem" class=".tableItem"></td>
-              <td contenteditable="true" name="tableItem" class=".tableItem"></td>
+              <td contenteditable="false" name="tableItem" class=".tableItem"><input readonly value="{{j+1}}" class="autocomplete_input"></td>
+              <td contenteditable="false" name="tableItem" class=".tableItem autocomplete"><input name="forename_input" class="autocomplete_input"></td>
+              <td contenteditable="false" name="tableItem" class=".tableItem autocomplete"><input name="surname_input" class="autocomplete_input"></td>
             {% endif %}
           </tr>
         {% endfor %}

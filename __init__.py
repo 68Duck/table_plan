@@ -98,6 +98,55 @@ class Table_plan(object):
         hash = m.hexdigest()
         return hash
 
+    def insert_into_table(self,table_name,record_values):
+        question_marks = ""
+        for i in range(len(record_values)):
+            question_marks = question_marks + "?,"
+        question_marks = question_marks[0:len(question_marks)-1]
+        query = "INSERT INTO {0} VALUES ({1})".format(table_name,question_marks)
+        self.query_db(query,record_values)
+
+@app.route("/table_plan/admin/<id>")
+def table_plan_admin(id):
+    table_plan = Table_plan()
+    table_names = ["Guests","RGS_students","people_in_tables","student_guest_link"]
+    if id == "ba01338ba5fa0c1584a6d41f93fe550b1d715a8de2da10d6c673131a85658394":
+        return render_template("table_plan_admin.html",table_names=table_names)
+    else:
+        return render_template("table_plan_error_page.html")
+
+@app.route("/table_plan_admin_open_table",methods=["POST"])
+def admin_open_table():
+    data = request.get_json()
+    if data is None:
+        return "No data recieved"
+    else:
+        table_name = data
+        table_plan = Table_plan()
+        table_information = table_plan.query_db("SELECT * FROM {0}".format(table_name,))
+        table_information = [list(dict.values()) for dict in table_information]
+        headings_info = table_plan.query_db("PRAGMA table_info({0})".format(table_name,))
+        table_information.insert(0,[header["name"] for header in headings_info])
+        return json.dumps(table_information)
+
+@app.route("/table_plan_admin_update_table",methods=["POST"])
+def admin_update_table():
+    data = request.get_json()
+    if data is None:
+        return "No data recieved"
+    else:
+        table_name = data.pop()
+        table_data = data
+        table_plan = Table_plan()
+        table_plan.query_db("BEGIN")
+        table_plan.query_db("DELETE FROM {0}".format(table_name))
+        for val in table_data:
+            table_plan.insert_into_table(table_name,val)
+        table_plan.query_db("COMMIT")
+
+        return json.dumps("nothing")
+
+
 @app.route("/table_plan_logon")
 def table_plan_logon():
     return render_template("table_plan_logon.html")
@@ -142,7 +191,29 @@ def table_plan(id):
                 pass
         # print(changeable_array)
         # print(table_data)
-        return render_template("table_plan.html",forename=record["forename"],surname=record["surname"],email=record["email"],table_data=table_data,no_tables=len(table_data),changeable_array=changeable_array)
+        forenames = []
+        surnames = []
+        names = []
+        records = table_plan.query_db("SELECT forename,surname FROM RGS_students")
+        for r in records:
+            forenames.append(r["forename"])
+            surnames.append(r["surname"])
+            names.append([r["forename"],r["surname"]])
+        records = table_plan.query_db("SELECT forename,surname FROM Guests")
+        for r in records:
+            forenames.append(r["forename"])
+            surnames.append(r["surname"])
+            names.append([r["forename"],r["surname"]])
+        fnames = []
+        for i in forenames:
+            if i not in fnames:
+                fnames.append(i)
+        snames = []
+        for i in surnames:
+            if i not in snames:
+                snames.append(i)
+        # surnames = set(surnames)
+        return render_template("table_plan.html",forename=record["forename"],surname=record["surname"],email=record["email"],table_data=table_data,no_tables=len(table_data),changeable_array=changeable_array,names=names,forenames=fnames,surnames=snames)
 
 @app.route("/table_plan_login_email",methods=["POST"])
 def send_login_email():
@@ -152,7 +223,7 @@ def send_login_email():
     else:
         table_plan = Table_plan_Login()
         email = data
-        email_record = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE email = ?",(email,))
+        email_record = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE email = ? COLLATE NOCASE",(email,))
         if len(email_record) == 0:
             return "There is no student with that email address. Please try again"
         elif len(email_record) > 1:
@@ -175,7 +246,7 @@ def find_changes():
             for j,val in enumerate(table):
                 if val[1] == "" and val[2] == "":
                     data[i][j] = None
-            data[i].remove(['Seat Number', 'Forename', 'Surname'])
+            data[i].pop(0)
         table_plan = Table_plan()
         database_table_information = table_plan.query_db("SELECT table_number,student_id,guest_id,seat_number FROM people_in_tables")
         table_data = []
@@ -186,10 +257,10 @@ def find_changes():
             table_data.append(row)
         for val in database_table_information:
             if val["student_id"] is not None:
-                student = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE student_id = ?",(val["student_id"],))[0]
+                student = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE student_id = ? COLLATE NOCASE",(val["student_id"],))[0]
                 table_data[val["table_number"]-1][val["seat_number"]-1] = [str(val["seat_number"]),student["forename"],student["surname"]]
             elif val["guest_id"] is not None:
-                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ?",(val["guest_id"],))[0]
+                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ? COLLATE NOCASE",(val["guest_id"],))[0]
                 table_data[val["table_number"]-1][val["seat_number"]-1] = [str(val["seat_number"]),guest["forename"],guest["surname"]]
             else:
                 pass
@@ -214,7 +285,7 @@ def confirm_changes():
         table_plan = Table_plan()
         forename = data["forename"]
         surname = data["surname"]
-        modifying_student_id_dict = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ?",(forename,surname))
+        modifying_student_id_dict = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ? COLLATE NOCASE",(forename,surname))
         if len(modifying_student_id_dict) == 0:
             return "Modifing student could not be found"
         else:
@@ -228,7 +299,8 @@ def confirm_changes():
             for j,val in enumerate(table):
                 if val[1] == "" and val[2] == "":
                     data[i][j] = None
-            data[i].remove(['Seat Number', 'Forename', 'Surname'])
+            # data[i].remove(['Seat Number', 'Forename', 'Surname'])
+            data[i].pop(0)
         database_table_information = table_plan.query_db("SELECT table_number,student_id,guest_id,seat_number FROM people_in_tables")
         table_data = []
         for i in range(number_of_tables):
@@ -238,10 +310,10 @@ def confirm_changes():
             table_data.append(row)
         for val in database_table_information:
             if val["student_id"] is not None:
-                student = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE student_id = ?",(val["student_id"],))[0]
+                student = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE student_id = ? COLLATE NOCASE",(val["student_id"],))[0]
                 table_data[val["table_number"]-1][val["seat_number"]-1] = [str(val["seat_number"]),student["forename"],student["surname"]]
             elif val["guest_id"] is not None:
-                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ?",(val["guest_id"],))[0]
+                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ? COLLATE NOCASE",(val["guest_id"],))[0]
                 table_data[val["table_number"]-1][val["seat_number"]-1] = [str(val["seat_number"]),guest["forename"],guest["surname"]]
             else:
                 pass
@@ -260,20 +332,19 @@ def confirm_changes():
         table_plan.query_db("BEGIN")
         for val in changes:
             if val[0] == None and val[1] == None:
-                table_plan.query_db("DELETE FROM people_in_tables WHERE table_number = ? AND seat_number = ?",(val[2],val[3]))
+                table_plan.query_db("DELETE FROM people_in_tables WHERE table_number = ? AND seat_number = ? COLLATE NOCASE",(val[2],val[3]))
             else:
-                student_id = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ?",(val[0],val[1]))
+                student_id = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ? COLLATE NOCASE",(val[0],val[1]))
                 if len(student_id) == 0:
-                    guest_id = table_plan.query_db("SELECT guest_id FROM Guests WHERE forename = ? AND surname = ?",(val[0],val[1]))
+                    guest_id = table_plan.query_db("SELECT guest_id FROM Guests WHERE forename = ? AND surname = ? COLLATE NOCASE",(val[0],val[1]))
                     if len(guest_id) == 0:
                         return "No student or guest found with name {0} {1}".format(val[0],val[1])
-                        print("test")
                     else:
-                        guest_links = table_plan.query_db("SELECT student_id FROM student_guest_link WHERE guest_id = ?",(guest_id[0]["guest_id"],))
+                        guest_links = table_plan.query_db("SELECT student_id FROM student_guest_link WHERE guest_id = ? COLLATE NOCASE",(guest_id[0]["guest_id"],))
                         if len(guest_links) == 0:
                             return "The guest is not associated with a student. This should not be possible"
 
-                        students_on_table = table_plan.query_db("SELECT student_id FROM people_in_tables WHERE table_number = ?",(val[2],))
+                        students_on_table = table_plan.query_db("SELECT student_id FROM people_in_tables WHERE table_number = ? COLLATE NOCASE",(val[2],))
                         valid = False
                         for student_dict in students_on_table:
                             if guest_links[0]["student_id"] == student_dict["student_id"]:

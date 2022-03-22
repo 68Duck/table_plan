@@ -1,0 +1,40 @@
+{% extends "base_table_plan.html" %}
+{%block title%}Table Plan Admin Page{%endblock%}
+{% block links %}<link rel="stylesheet" href="{{url_for('static',filename='table_plan_admin.css')}}" type="text/css">{% endblock %}
+{%block scripts %}
+<script src="{{url_for('static', filename='table_plan_admin.js')}}" charset="utf-8"></script>
+{%endblock%}
+{% block header %}
+Admin page for table plan
+{% endblock %}
+{%block content%}
+
+<div class="tableBackground">
+  <h4>Choose Table:</h4>
+  <br/>
+  <select id="table_name_choice">
+    {% for table_name in table_names %}
+      <option value="{{table_name}}">{{table_name}}</option>
+    {% endfor %}
+  </select>
+  <br/><br/>
+  <input class="btn" type = "submit" value="Submit" onclick="open_table()"/>
+</div>
+
+<br/>
+<br/>
+<div class="tableBackground">
+  <table class="table" id = "table">
+
+  </table>
+</div>
+<br/>
+<div class="tableBackground">
+    <input class="btn" type = "submit" value="Submit Changes" onclick="update_table()"/>
+</div>
+
+{%endblock%}
+
+{% block footer %}
+<p>Admin Page</p>
+{% endblock %}
