@@ -1,0 +1,265 @@
+*{
+  /* the star is the universal thing so these things apply to everything */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+footer {
+  background-color: rgba(200,200,200,0.1);
+  width: 100vw;
+  height: 10vh;
+  margin-top: 5vh;
+  text-align: center;
+  padding: 10px;
+}
+
+footer p{
+color: white;
+font-size: 12px;
+
+}
+
+body {
+  --backgroundColour: #292C34;
+  background-color: var(--backgroundColour);
+  background-color: #292C34;
+  top: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden
+
+} */
+
+
+
+header{
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  top: 100px;
+  left: 0;
+  position: fixed;
+  color: black;
+  text-align: center;
+  background-color: white;
+  /* width: 100px; */
+  align-items: center;
+  justify-content: center;
+  width: 96vw;
+  margin: 1vw;
+  padding: 5px;
+  border-radius: 2px;
+
+
+}
+
+header h1 {
+
+  color: black;
+  text-align: center;
+  background-color: white;
+  width: 100px;
+  align-items: center;
+  justify-content: center;
+  width: 96vw;
+  margin: 1vw;
+  padding: 5px;
+  border-radius: 2px;
+
+}
+
+.hamburgerMenuDisplayItem{
+  background-color: #ffffff;
+  color: black;
+  padding: 5px;
+  padding-left: 20px;
+  margin: 0px;
+  height: 30px;
+  display: grid;
+  transition: all 5s ease-in-out;
+  animation: load 1s forwards;
+  opacity: 0;
+  --animationDelay : 0s;
+  animation-delay: var(--animationDelay);
+  /* grid-template-columns: repeat(1,auto); */
+}
+.hamburgerMenuDisplay{
+  /* background-color: #ffffff; */
+  /* color: black;
+  padding: 5px;
+  margin: 0px;
+  display: grid;
+  transition: all .5s ease-in-out;
+  grid-template-columns: repeat(1,auto);
+  animation: load 1s forwards;
+  opacity: 0; */
+  /* --animationDelay : 10s;
+  animation-delay: var(--animationDelay); */
+}
+
+@keyframes load{
+  0%{
+    transform: translateY(-10px);
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+nav{
+  z-index: 100;
+  overflow: hidden;
+  --displayType: flex;
+  display: var(--displayType);
+  display: flex;
+  top: 0;
+  left: 0;
+  background-color: #ffffff;
+  color: black;
+  padding: 5px;
+  padding-left: 10px;
+  margin: 0px;
+  height: 80px;
+  /* display: flex; */
+  /* gap: 20px; */
+  /* grid-template-columns: repeat(2,auto); */
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/* .sticky + .content{
+  padding-top: 60px;
+} */
+
+/* nav h2 {
+  display: inline-block;
+  font-weight: lighter;
+  position: absolute;
+  margin-left: 10px;
+  top: 37px;
+  margin-left: 75px;
+} */
+
+/* nav p {
+  display:inline-block;
+  font-weight: lighter;
+  position: absolute;
+  margin-top: 25px;
+  margin-left: 10px;
+} */
+
+nav a{
+  text-decoration: none;
+  color: #555555;
+  /* left: 0; */
+}
+.logoImageATag{
+  top: 5px;
+  width: 50.8px;
+  height: 75px;
+}
+
+nav .button{
+  /* --margin-left: 14px; */
+  /* display: inline-block;
+  position: fixed; */
+  /* margin-left: var(--margin-left); */
+  top: 30px;
+  /* left: 0; */
+  color: #666666;
+  font-size: 17px;
+}
+
+
+ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.buttonListItem {
+  padding-top: 22px;
+  /* left: 0; */
+  color: #444444;
+  font-size: 17px;
+  text-decoration: none;
+  left: 10px;
+  padding-left: 20px;
+}
+
+.buttonUnorderedList{
+  left: 10px;
+}
+
+
+
+.hamburgerMenu{
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all .5s ease-in-out;
+  border: 3px solid lightgrey;
+  right: 5%;
+  top: 20px;
+  border-radius: 5px;
+}
+
+.hamburgerMenuButton{
+  width: 25px;
+  height: 3px;
+  background: grey;
+  border-radius: 2.5px;
+  /* box-shadow: 0 2px 5px rgba(255,101,47,.2); */
+  transition: all .5s ease-in-out;
+
+}
+
+.hamburgerMenuButton::before,
+.hamburgerMenuButton::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 3px;
+  background: grey;
+  border-radius: 2.5px;
+  transition: all .5s ease-in-out;
+}
+
+.hamburgerMenuButton::before{
+  transform: translateY(-8px);
+}
+.hamburgerMenuButton::after{
+  transform: translateY(8px);
+}
+
+
+.hamburgerMenu.open .hamburgerMenuButton {
+  transform: translateX(-25px);
+  background: transparent;
+  box-shadow: none;
+}
+
+.hamburgerMenu.open .hamburgerMenuButton::before {
+  transform: rotate(45deg) translate(17.5px,-17.5px)
+}
+.hamburgerMenu.open .hamburgerMenuButton::after {
+  transform: rotate(-45deg) translate(17.5px,17.5px)
+}
+
+
+
+
+
+nav .hide{
+  display: none;
+}

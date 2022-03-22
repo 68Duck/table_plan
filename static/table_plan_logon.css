@@ -1,0 +1,64 @@
+.alert{
+  color: red;
+}
+
+.alertDiv{
+  background-color: white;
+  color: red;
+  width: 80vw;
+  border-radius: 5px;
+  left: 9.3vw;
+  padding: 10px;
+  box-shadow: 0 0 10px 2px;
+  transition: all 0.5s ease;
+  position: relative;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.tableBackground{
+  background-color: white;
+  color: black;
+  width: 80vw;
+  border-radius: 5px;
+  left: 9.3vw;
+  padding: 10px;
+  box-shadow: 0 0 10px 2px;
+  transition: all 0.5s ease;
+  position: relative;
+}
+.messagesDiv{
+  background-color: white;
+  color: black;
+  width: 80vw;
+  border-radius: 5px;
+  left: 9.3vw;
+  padding: 10px;
+  box-shadow: 0 0 10px 2px;
+  transition: all 0.5s ease;
+  position: relative;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px 2px;
+  color: green;
+
+}
+.message{
+  color: black;
+}
+
+
+
+
+main .btn {
+  border: 1px solid black;
+  background-color: #0000ff;
+  color: white;
+  border-radius: 5px;
+  outline: none;
+  padding: 5px 10px;
+  transition: all 0.2s ease;
+  z-index: 10;
+}

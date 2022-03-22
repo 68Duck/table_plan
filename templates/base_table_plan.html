@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{url_for('static',filename='base_table_plan.css')}}" type="text/css">
+    <link rel="shortcut icon" type="icon/x-icon" href="{{url_for('static',filename='Images/wordlessLogo.jpg')}}" />
+    {% block links %}{% endblock %}
+    <!-- <link rel="shortcut icon" type="icon/x-icon" href="Images/wordlessLogo.png" /> -->
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <nav id="nav">
+      <a href="/" class="logoImageATag">
+        <!-- <img src="Images/logo2.png" alt="Logo image" height="75px"> -->
+        <img src="{{url_for('static',filename='Images/wordlessLogo.jpg')}}" alt="Logo image" height="65px">
+      </a>
+      <ul class="buttonUnorderedList">
+
+      </ul>
+      <div class="hamburgerMenu hide">
+        <div class="hamburgerMenuButton"></div>
+      </div>
+
+      <div id="hamburgerMenuDisplay" class="hamburgerMenuDisplay">
+      </nav>
+    <header>
+      <h1>{% block header %}{% endblock %}</h1>
+    </header>
+    <main id="main" class="content">
+      {% block content %}
+      {% endblock %}
+    </main>
+    <footer>
+      <p>
+        {% block footer %}
+        {% endblock %}
+      </p>
+    </footer>
+    <script src="{{url_for('static', filename='base_table_plan.js')}}" charset="utf-8"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

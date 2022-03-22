@@ -1,0 +1,99 @@
+{% extends "base_table_plan.html" %}
+{%block title%}Table Plan Login{%endblock%}
+{% block links %}<link rel="stylesheet" href="{{url_for('static',filename='table_plan.css')}}" type="text/css">{% endblock %}
+{%block scripts %}<script src="{{url_for('static', filename='table_plan.js')}}" charset="utf-8"></script>{%endblock%}
+{% block header %}
+Table Plan Login
+{% endblock %}
+{%block content%}
+<div class="alertDiv" id="alertDiv" style="display:none">
+  <p class="alert" id="alert"></p>
+</div>
+<div class="messagesDiv" id="messagesDiv" style="display:none">
+  <p class="message" id="message"></p>
+</div>
+<br/>
+
+<div class="tableBackground" style="display:none" name="confirming_changes_display">
+  <button type="button" class="btn" onclick="back_pressed()">Back</button>
+  <br/>
+  <br/>
+  <h4>You made the following changes:</h4>
+  <br/>
+  <table class="table" id="changes_table"></table>
+  <br/>
+  Press submit to confirm these changes.
+  <br/>
+  <br/>
+  <button type="submit" class="btn" id="confirm_changes_button" onclick="confirm_changes_pressed()">Confirm changes</button>
+</div>
+
+<div class="tableBackground" name="changing_tables_input" style="display:block">
+  Welcome <span id="forename_span">{{forename}}</span> <span id="surname_span">{{surname}}</span>,
+  <br/><br/>
+  This is the page where you can edit your place in the seating plan. If you also would like to add someone else to the same table as you, you can do this by finding their name in the drop down.
+  This will email them though so please make sure that you have consulted them first. Also, please <b>press submit to save your changes</b>.
+  <br/><br/>
+  By changing this page you, are confirming that you are entering the correct data to the best of your ability.
+</div>
+
+<br/>
+<div class="tableBackground" name="changing_tables_input" style="display:block">
+  <button type="submit" name="submit_button" class="btn" onclick="submit_pressed()">Submit your changes</button>
+</div>
+<br/>
+
+{% for i in range(no_tables) %}
+  <br/>
+  <div class="tableBackground" class="tableDiv" name="changing_tables_input" style="display:block">
+    <h4>
+      Table Number {{i+1}}:
+    </h4>
+    <table name="table" class="table">
+      <thead>
+        <tr>
+          <th>Seat Number</th>
+          <th>Forename</th>
+          <th>Surname</th>
+        </tr>
+      </thead>
+      <br/>
+      <tbody>
+        {% for j in range(table_data[i]|length) %}
+          <tr>
+            {% if table_data[i][j] %}
+              {% for k in range(table_data[i][j]|length) %}
+                {% if k == 0 %}
+                  <!-- this if statement is not necessary but is there in case the changeable property needs to be changed later -->
+                  <td contenteditable="false" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                {% else %}
+                  {% if changeable_array[i][j] %}
+                    <td contenteditable="true" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                  {% else %}
+                    <td contenteditable="false" name="tableItem" class=".tableItem">{{table_data[i][j][k]}}</td>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <td contenteditable="false" name="tableItem" class=".tableItem">{{j+1}}</td>
+              <td contenteditable="true" name="tableItem" class=".tableItem"></td>
+              <td contenteditable="true" name="tableItem" class=".tableItem"></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <br/>
+{% endfor %}
+
+<div class="tableBackground" name="changing_tables_input" style="display:block">
+  <button type="submit" name="submit_button" class="btn" onclick="submit_pressed()">Submit your changes</button>
+</div>
+
+
+{%endblock%}
+
+{% block footer %}
+<p>Table plan for the 2022 leavers ball at RGSHW created by Josh Henry. Email me on HenryJP@rgshw.com if there are any issues with this page</p>
+{% endblock %}

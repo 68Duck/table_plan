@@ -1,0 +1,36 @@
+{% extends "base_table_plan.html" %}
+{%block title%}Table Plan Login{%endblock%}
+{% block links %}<link rel="stylesheet" href="{{url_for('static',filename='table_plan_logon.css')}}" type="text/css">{% endblock %}
+{%block scripts %}<script src="{{url_for('static', filename='table_plan_logon.js')}}" charset="utf-8"></script>{%endblock%}
+{% block header %}
+Table Plan Login
+{% endblock %}
+{%block content%}
+<div class="alertDiv" id="alertDiv" style="display:none">
+  <p class="alert" id="alert"></p>
+</div>
+<div class="messagesDiv" id="messagesDiv" style="display:none">
+  <p class="message" id="message"></p>
+</div>
+<br/>
+<div class="tableBackground" id="email_input_div" style="display:block">
+  <h4>Please enter your school email:</h4>
+  <br/>
+  <input id="email_input" width="30%"></input>
+  <br/>
+  <br/>
+  <input type="submit" class="btn" value="Submit" onclick="submit_pressed()"></input>
+</div>
+
+<div class="tableBackground" style="display:none" id="email_sent_message">
+  An email was sent to your email address. Please use the link in that email change to access and edit the table plan.
+  This is done to ensure that it is you that is changing your name and it can be tracked who changed your name.
+</div>
+
+
+
+{%endblock%}
+
+{% block footer %}
+<p>Table plan for the 2022 leavers ball at RGSHW created by Josh Henry. Email me on HenryJP@rgshw.com if there are any issues with this page</p>
+{% endblock %}
