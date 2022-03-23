@@ -332,7 +332,28 @@ def confirm_changes():
         table_plan.query_db("BEGIN")
         for val in changes:
             if val[0] == None and val[1] == None:
+                guests_on_table = table_plan.query_db("SELECT guest_id FROM people_in_tables WHERE table_number = ? COLLATE NOCASE",(val[2],))
+                student_id = table_plan.query_db("SELECT student_id FROM people_in_tables WHERE table_number = ? and seat_number = ? COLLATE NOCASE",(val[2],val[3]))
+                if len(student_id) == 0:
+                    pass
+                else:
+                    student_id = student_id[0]["student_id"]
+                    guests_with_student = table_plan.query_db("SELECT guest_id FROM student_guest_link WHERE student_id = ? COLLATE NOCASE" ,(student_id,))
+                    for g in guests_with_student:
+                        if g in guests_on_table:
+                            valid = False
+                            guest_seat_number = table_plan.query_db("SELECT seat_number FROM people_in_tables WHERE guest_id = ?",(g["guest_id"],))
+                            for v in changes:
+                                if v[2] == val[2]: #so same table number
+                                    if guest_seat_number[0]["seat_number"] == v[3]:
+                                        valid = True
+                            if not valid:
+                                student = table_plan.query_db("SELECT forename,surname FROM RGS_students WHERE student_id = ? COLLATE NOCASE",(student_id,))
+                                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ?",(g["guest_id"],))
+                                return "The student {0} {1} cannot be removed since they are on the same table as their guest {2} {3}. Please delete the guest before trying to delete the RGS student.".format(student[0]["forename"],student[0]["surname"],guest[0]["forename"],guest[0]["surname"])
+
                 table_plan.query_db("DELETE FROM people_in_tables WHERE table_number = ? AND seat_number = ? COLLATE NOCASE",(val[2],val[3]))
+
             else:
                 student_id = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ? COLLATE NOCASE",(val[0],val[1]))
                 if len(student_id) == 0:
@@ -344,17 +365,9 @@ def confirm_changes():
                         if len(guest_links) == 0:
                             return "The guest is not associated with a student. This should not be possible"
 
-                        students_on_table = table_plan.query_db("SELECT student_id FROM people_in_tables WHERE table_number = ? COLLATE NOCASE",(val[2],))
-                        valid = False
-                        for student_dict in students_on_table:
-                            if guest_links[0]["student_id"] == student_dict["student_id"]:
-                                valid = True
-                        if valid:
-                            table_plan.query_db("INSERT INTO people_in_tables(table_number,guest_id,seat_number,modified_by_id) VALUES (?,?,?,?)",(val[2],guest_id[0]["guest_id"],val[3],modifying_student_id))
-                        else:
-                            student = table_plan.query_db("SELECT forename,surname FROM RGS_students WHERE student_id = ?",(guest_links[0]["student_id"],))
-                            return "Any guest must be placed on the same table as the student resposable for them. Guest {0} {1} must be placed on the same table as {2} {3}".format(val[0],val[1],student[0]['forename'],student[0]['surname'])
+
                 else:
+                    table_plan.query_db("DELETE FROM people_in_tables WHERE table_number = ? AND seat_number = ?",(val[2],val[3]))
                     table_plan.query_db("INSERT INTO people_in_tables(table_number,student_id,seat_number,modified_by_id) VALUES (?,?,?,?)",(val[2],student_id[0]["student_id"],val[3],modifying_student_id))
 
         student_ids = table_plan.query_db("SELECT student_id FROM people_in_tables")
@@ -374,6 +387,24 @@ def confirm_changes():
         if len(student_ids) == len(student_ids_set):
             if len(guest_ids) == len(guest_ids_set):
                 table_plan.query_db("COMMIT")
+                for val in changes:
+                    if val[0] == None and val[1] == None:
+                        pass
+                    else:
+                        student_id = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ? COLLATE NOCASE",(val[0],val[1]))
+                        if len(student_id) == 0: #if student_id is zero, then len(guest_id) must be >0 since validation done above
+                            guest_id = table_plan.query_db("SELECT guest_id FROM Guests WHERE forename = ? AND surname = ? COLLATE NOCASE",(val[0],val[1]))
+                            students_on_table = table_plan.query_db("SELECT student_id FROM people_in_tables WHERE table_number = ? COLLATE NOCASE",(val[2],))
+                            valid = False
+                            for student_dict in students_on_table:
+                                if guest_links[0]["student_id"] == student_dict["student_id"]:
+                                    valid = True
+                            if valid:
+                                table_plan.query_db("DELETE FROM people_in_tables WHERE table_number = ? AND seat_number = ?",(val[2],val[3]))
+                                table_plan.query_db("INSERT INTO people_in_tables(table_number,guest_id,seat_number,modified_by_id) VALUES (?,?,?,?)",(val[2],guest_id[0]["guest_id"],val[3],modifying_student_id))
+                            else:
+                                student = table_plan.query_db("SELECT forename,surname FROM RGS_students WHERE student_id = ?",(guest_links[0]["student_id"],))
+                                return "Any guest must be placed on the same table as the student resposable for them. Guest {0} {1} must be placed on the same table as {2} {3}".format(val[0],val[1],student[0]['forename'],student[0]['surname'])
             else:
                 for id in guest_ids_set:
                     guest_ids.remove(id)
