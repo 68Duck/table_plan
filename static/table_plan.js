@@ -88,6 +88,7 @@ function back_pressed(){
   while (changes_table.firstChild) {
     changes_table.removeChild(changes_table.firstChild)
   }
+  window.location.reload()
 }
 
 const confirm_changes = async (table_data) => {
