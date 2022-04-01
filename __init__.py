@@ -286,6 +286,27 @@ def confirm_changes():
         table_plan = Table_plan()
         forename = data["forename"]
         surname = data["surname"]
+        check_data = data["check_data"]
+
+        database_table_information = table_plan.query_db("SELECT table_number,student_id,guest_id,seat_number FROM people_in_tables")
+        current_table_data = []
+        for i in range(number_of_tables):
+            row = []
+            for j in range(number_of_seats_per_table):
+                row.append(None)
+            current_table_data.append(row[:])
+        for val in database_table_information:
+            if val["student_id"] is not None:
+                # print(val["student_id"])
+                student = table_plan.query_db("SELECT forename,surname,email FROM RGS_students WHERE student_id = ?",(val["student_id"],))[0]
+                current_table_data[val["table_number"]-1][val["seat_number"]-1] = [val["seat_number"],student["forename"],student["surname"]]
+            elif val["guest_id"] is not None:
+                guest = table_plan.query_db("SELECT forename,surname FROM Guests WHERE guest_id = ?",(val["guest_id"],))[0]
+                current_table_data[val["table_number"]-1][val["seat_number"]-1] = [val["seat_number"],guest["forename"],guest["surname"]]
+
+        if check_data != current_table_data:
+            return "Someone else has made some changes whilst you have been viewing this page. Please refresh to see these changes before making your changes."
+
         modifying_student_id_dict = table_plan.query_db("SELECT student_id FROM RGS_students WHERE forename = ? AND surname = ? COLLATE NOCASE",(forename,surname))
         if len(modifying_student_id_dict) == 0:
             return "Modifing student could not be found"

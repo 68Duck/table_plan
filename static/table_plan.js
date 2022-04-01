@@ -96,7 +96,8 @@ const confirm_changes = async (table_data) => {
   var confirm_changes_data = {
     "table_data":table_data,
     "forename":forename_span.innerHTML,
-    "surname":surname_span.innerHTML
+    "surname":surname_span.innerHTML,
+    "check_data":original_table_data
   }
   const body = JSON.stringify(confirm_changes_data); // whatever you want to send in the body of the HTTP request
   const headers = {'Content-Type': 'application/json'}; // if you're sending JSON to the server
